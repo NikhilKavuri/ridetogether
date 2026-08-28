@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Two pins side by side: the whole point of the app in one glyph.
+         Drawn inside the 72dp safe zone of the 108dp adaptive canvas. -->
+    <group android:translateX="18" android:translateY="18">
+        <path
+            android:fillColor="#FFE8590C"
+            android:pathData="M26,8C18.27,8 12,14.27 12,22c0,10.5 14,26 14,26s14,-15.5 14,-26C40,14.27 33.73,8 26,8zM26,27c-2.76,0 -5,-2.24 -5,-5s2.24,-5 5,-5 5,2.24 5,5 -2.24,5 -5,5z" />
+        <path
+            android:fillColor="#FF74C0FC"
+            android:pathData="M48,24C41.37,24 36,29.37 36,36c0,9 12,22 12,22s12,-13 12,-22C60,29.37 54.63,24 48,24zM48,40c-2.21,0 -4,-1.79 -4,-4s1.79,-4 4,-4 4,1.79 4,4 -1.79,4 -4,4z" />
+    </group>
+</vector>

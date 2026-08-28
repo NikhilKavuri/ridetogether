@@ -1,0 +1,41 @@
+{
+  "rules": {
+    "rides": {
+      "$code": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+
+        "meta": {
+          ".validate": "newData.hasChildren(['hostUid', 'createdAt'])"
+        },
+
+        "members": {
+          "$uid": {
+            ".write": "auth != null && auth.uid == $uid",
+            ".validate": "newData.hasChildren(['name'])"
+          }
+        },
+
+        "live": {
+          "$uid": {
+            ".write": "auth != null && auth.uid == $uid",
+            "lat": { ".validate": "newData.isNumber() && newData.val() >= -90 && newData.val() <= 90" },
+            "lng": { ".validate": "newData.isNumber() && newData.val() >= -180 && newData.val() <= 180" }
+          }
+        },
+
+        "breaks": {
+          "$uid": {
+            ".write": "auth != null && auth.uid == $uid"
+          }
+        },
+
+        "events": {
+          "$event": {
+            ".write": "auth != null && !data.exists()"
+          }
+        }
+      }
+    }
+  }
+}

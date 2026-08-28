@@ -1,0 +1,16 @@
+*.iml
+.gradle/
+local.properties
+.idea/
+.DS_Store
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+
+# The real Firebase config is injected by CI from a secret, or dropped in
+# locally by you. The committed google-services.json is a harmless placeholder
+# and the app refuses to run against it (see SetupGate.kt).
+!app/google-services.json
