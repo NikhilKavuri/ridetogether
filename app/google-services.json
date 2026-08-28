@@ -1,14 +1,13 @@
 {
   "project_info": {
-    "project_number": "000000000000",
-    "project_id": "ridetogether-placeholder",
-    "firebase_url": "https://ridetogether-placeholder-default-rtdb.firebaseio.com",
-    "storage_bucket": "ridetogether-placeholder.appspot.com"
+    "project_number": "1084007018176",
+    "project_id": "ridetogether-39306",
+    "storage_bucket": "ridetogether-39306.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+        "mobilesdk_app_id": "1:1084007018176:android:cd599c67ede74ca06c4725",
         "android_client_info": {
           "package_name": "com.nikhil.ridetogether"
         }
@@ -16,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyPLACEHOLDER-replace-with-your-own-key0"
+          "current_key": "AIzaSyCWfirQNDjbohXFG4qKHvJWhv5c1eZUHUM"
         }
       ],
       "services": {
