@@ -31,7 +31,9 @@ class RideCodeTest {
 
     @Test
     fun `the confusable characters are never generated`() {
-        val forbidden = setOf('O', '0', 'I', '1', 'L', 'S', '5')
+        // L stays in the alphabet: its look-alikes (I and 1) are both excluded,
+        // so nothing is left for it to be confused with.
+        val forbidden = setOf('O', '0', 'I', '1', 'S', '5')
         repeat(2_000) {
             val code = RideCode.generate()
             forbidden.forEach { assertFalse("$code contains $it", code.contains(it)) }
@@ -43,7 +45,7 @@ class RideCodeTest {
         // None of these are in the alphabet, so a real code never contains one.
         // Dropping them shortens the code and fails validation, which is the
         // safe outcome -- guessing could send someone into a stranger's ride.
-        assertEquals("", RideCode.normalise("o0Il5s"))
+        assertEquals("", RideCode.normalise("o0I5s"))
         assertFalse(RideCode.isValid(RideCode.normalise("ABC0DE")))
     }
 

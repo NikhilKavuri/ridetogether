@@ -71,7 +71,10 @@ class GeoTest {
         assertEquals("N", Geo.compassPoint(359.0))
         assertEquals("NE", Geo.compassPoint(45.0))
         assertEquals("W", Geo.compassPoint(270.0))
-        assertEquals("NW", Geo.compassPoint(285.16))
+        assertEquals("NW", Geo.compassPoint(315.0))
+        // Hyderabad -> Pune. 285 sits 15 degrees off due west and 30 off
+        // north-west, so it snaps to W.
+        assertEquals("W", Geo.compassPoint(285.16))
     }
 
     @Test
