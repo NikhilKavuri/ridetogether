@@ -12,8 +12,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 
 class RideViewModel(
     private val repo: RideRepository,
@@ -26,6 +28,10 @@ class RideViewModel(
      * someone who has just opened the app.
      */
     private val alertFreshnessMs = 120_000L
+
+    private companion object {
+        const val TIMEOUT_MS = 20_000L
+    }
 
     private val seenEventIds = LinkedHashSet<String>()
 
@@ -118,8 +124,15 @@ class RideViewModel(
      */
     private fun runAction(block: suspend () -> Unit) {
         viewModelScope.launch {
-            runCatching { block() }.onFailure {
-                _actionError.value = it.message ?: "Something went wrong. Try again."
+            // Same reason as MainViewModel: an unreachable database makes an
+            // awaited write hang rather than fail. Silently hanging on "I need
+            // a break" is the worst failure this app has, so it gets a deadline.
+            runCatching { withTimeout(TIMEOUT_MS) { block() } }.onFailure {
+                _actionError.value = when (it) {
+                    is TimeoutCancellationException ->
+                        "Could not reach the group. Your message may not have been sent."
+                    else -> it.message ?: "Something went wrong. Try again."
+                }
             }
         }
     }

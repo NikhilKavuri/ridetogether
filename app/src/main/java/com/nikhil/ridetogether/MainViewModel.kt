@@ -9,8 +9,10 @@ import com.nikhil.ridetogether.util.RideCode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 
 sealed interface AppScreen {
     data object Home : AppScreen
@@ -40,6 +42,10 @@ class MainViewModel(
     private val repo: RideRepository,
     private val prefs: RidePrefs
 ) : ViewModel() {
+
+    private companion object {
+        const val TIMEOUT_MS = 20_000L
+    }
 
     private val _ui = MutableStateFlow(HomeUiState(name = prefs.displayName))
     val ui: StateFlow<HomeUiState> = _ui.asStateFlow()
@@ -93,7 +99,12 @@ class MainViewModel(
     private fun launchGuarded(block: suspend () -> Unit) {
         _ui.update { it.copy(busy = true, error = null) }
         viewModelScope.launch {
-            runCatching { block() }.onFailure { e ->
+            // Firebase offline persistence queues writes and waits for a server
+            // ack that never comes if the database is unreachable or was never
+            // created -- so an await() here can hang forever with no error at
+            // all. Every user-triggered call goes through this one function, so
+            // one timeout covers create and join both.
+            runCatching { withTimeout(TIMEOUT_MS) { block() } }.onFailure { e ->
                 _ui.update { it.copy(busy = false, error = messageFor(e)) }
             }
         }
@@ -104,6 +115,9 @@ class MainViewModel(
      * check the code; the exception's own message does not.
      */
     private fun messageFor(e: Throwable): String = when (e) {
+        is TimeoutCancellationException ->
+            "Could not reach the ride database. Check your connection — and in " +
+                "Firebase, that Realtime Database exists and its rules are published."
         is RideNotFoundException ->
             "No active ride with code ${e.code}. Check the code and try again."
         is RideFullException ->

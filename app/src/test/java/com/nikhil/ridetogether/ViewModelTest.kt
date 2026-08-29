@@ -114,6 +114,27 @@ class MainViewModelTest {
     }
 
     @Test
+    fun `an unreachable database times out instead of spinning forever`() {
+        // The real failure this reproduces: Firebase queues the write and waits
+        // for a server ack that never arrives, so the call never returns and
+        // never throws. Before the timeout this left the button spinning with
+        // no error, which reads as "the app is broken".
+        repo.hangNextJoin = true
+        viewModel.updateName("Nikhil")
+        viewModel.updateCode("ABC234")
+        viewModel.joinRide()
+
+        assertTrue("should be busy while waiting", viewModel.ui.value.busy)
+
+        dispatcher.scheduler.advanceTimeBy(21_000)
+        dispatcher.scheduler.runCurrent()
+
+        assertFalse("spinner must stop", viewModel.ui.value.busy)
+        assertNotNull("must explain itself", viewModel.ui.value.error)
+        assertTrue(viewModel.ui.value.error!!.contains("Realtime Database"))
+    }
+
+    @Test
     fun `a second rider can join the ride the host created`() {
         viewModel.updateName("Nikhil")
         viewModel.createRide()

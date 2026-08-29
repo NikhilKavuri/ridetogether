@@ -8,6 +8,7 @@ import com.nikhil.ridetogether.data.model.RideEventType
 import com.nikhil.ridetogether.data.model.Rider
 import com.nikhil.ridetogether.data.model.RiderLocation
 import com.nikhil.ridetogether.util.RideCode
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -47,6 +48,12 @@ class FakeRideRepository(
 
     /** Set by tests to force a specific failure. */
     var failNextJoin: Exception? = null
+
+    /**
+     * Makes the next join hang forever instead of failing, which is what
+     * Firebase actually does when the database is unreachable.
+     */
+    var hangNextJoin: Boolean = false
 
     /** Every location published through the repository, for throttle assertions. */
     val publishedLocations = mutableListOf<RiderLocation>()
@@ -140,6 +147,10 @@ class FakeRideRepository(
 
     override suspend fun joinRide(code: String, displayName: String): Ride {
         failNextJoin?.let { failNextJoin = null; throw it }
+        if (hangNextJoin) {
+            hangNextJoin = false
+            awaitCancellation()
+        }
 
         val normalised = RideCode.normalise(code)
         val ride = ridesMeta[normalised]?.value ?: throw RideNotFoundException(normalised)
